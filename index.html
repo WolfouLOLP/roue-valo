@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valorant - Roue d'achat</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f1923 0%, #050b10 100%);
+    font-family: 'Rajdhani', sans-serif;
+    color: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 90%;
+    max-width: 420px;
+    background: rgba(31, 41, 51, 0.95);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 0 40px rgba(255, 70, 85, 0.15);
+    border: 1px solid rgba(255, 70, 85, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    color: #ff4655;
+    letter-spacing: 2px;
+    margin: 0 0 24px 0;
+    text-align: center;
+    font-size: 28px;
+}
+
+/* Inputs */
+.input-section {
+    margin-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    background: #0f1923;
+    border: 2px solid #ff4655;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+input[type="number"]:focus {
+    border-color: #ff6b76;
+    box-shadow: 0 0 10px rgba(255, 70, 85, 0.3);
+}
+
+input[type="number"]::placeholder {
+    color: #6b7280;
+}
+
+/* Options */
+.options-grid {
+    display: grid;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(15, 25, 35, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+label:hover {
+    background: rgba(15, 25, 35, 0.8);
+    transform: translateX(4px);
+    border-color: rgba(255, 70, 85, 0.3);
+}
+
+label.checked {
+    background: rgba(255, 70, 85, 0.1);
+    border-color: #ff4655;
+}
+
+input[type="checkbox"] {
+    accent-color: #ff4655;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.option-text {
+    flex: 1;
+    font-size: 16px;
+}
+
+.option-price {
+    color: #22c55e;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.stat-box {
+    background: #0f1923;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid rgba(255, 70, 85, 0.2);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.stat-value.positive {
+    color: #22c55e;
+}
+
+.stat-value.negative {
+    color: #ef4444;
+}
+
+/* Boutons */
+.button-group {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #ff4655, #ff6b76);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 70, 85, 0.4);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    background: #374151;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+button.secondary {
+    background: linear-gradient(135deg, #374151, #4b5563);
+}
+
+button.secondary:hover:not(:disabled) {
+    box-shadow: 0 8px 20px rgba(75, 85, 99, 0.4);
+}
+
+/* Roue */
+.wheel-container {
+    position: relative;
+    margin: 30px auto;
+    width: 260px;
+    height: 260px;
+}
+
+#wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        #ff4655 0deg 72deg,
+        #ff6b76 72deg 144deg,
+        #1f2933 144deg 216deg,
+        #ff4655 216deg 288deg,
+        #0f1923 288deg 360deg
+    );
+    border: 6px solid #ff4655;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.6),
+                0 0 30px rgba(255,70,85,0.3);
+    transition: transform 3s cubic-bezier(0.33, 1, 0.68, 1);
+    position: relative;
+}
+
+#wheel.spinning {
+    pointer-events: none;
+}
+
+/* Flèche indicateur */
+.wheel-arrow {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ff4655;
+    font-size: 32px;
+    filter: drop-shadow(0 0 8px rgba(255, 70, 85, 0.8));
+    z-index: 10;
+}
+
+/* Résultat */
+#result {
+    margin-top: 20px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 8px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#result.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 2px solid #22c55e;
+    animation: resultPop 0.4s ease;
+}
+
+#result.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 2px solid #ef4444;
+}
+
+@keyframes resultPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Historique */
+.history-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 70, 85, 0.2);
+}
+
+.history-title {
+    font-size: 14px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+#history {
+    max-height: 150px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#history::-webkit-scrollbar {
+    width: 6px;
+}
+
+#history::-webkit-scrollbar-track {
+    background: #0f1923;
+    border-radius: 3px;
+}
+
+#history::-webkit-scrollbar-thumb {
+    background: #ff4655;
+    border-radius: 3px;
+}
+
+.history-item {
+    background: #0f1923;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid #ff4655;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.history-weapon {
+    font-weight: 700;
+    color: #ff6b76;
+}
+
+.history-price {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.empty-history {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 24px;
+    }
+    
+    .wheel-container {
+        width: 220px;
+        height: 220px;
+    }
+    
+    #wheel {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🎯 Roue d'achat Valorant</h1>
+
+    <div class="input-section">
+        <span class="input-label">💰 Crédits disponibles</span>
+        <input type="number" id="money" placeholder="Entrez vos crédits" min="0">
+    </div>
+
+    <div class="options-grid">
+        <label id="shieldLabel">
+            <input type="checkbox" id="shield">
+            <span class="option-text">🛡️ Gros shield</span>
+            <span class="option-price">-1000</span>
+        </label>
+
+        <label id="spellsLabel">
+            <input type="checkbox" id="spells">
+            <span class="option-text">✨ Toutes les spells</span>
+            <span class="option-price">-600</span>
+        </label>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-label">Dépenses</div>
+            <div class="stat-value" id="expenses">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Restant</div>
+            <div class="stat-value positive" id="remaining">0</div>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button id="spinBtn" disabled>🎲 Lancer la roue</button>
+        <button id="resetBtn" class="secondary">🔄 Réinitialiser</button>
+    </div>
+
+    <div class="wheel-container">
+        <div class="wheel-arrow">▼</div>
+        <div id="wheel">?</div>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="history-section">
+        <div class="history-title">📜 Historique des lancers</div>
+        <div id="history">
+            <div class="empty-history">Aucun lancer pour le moment</div>
+        </div>
+    </div>
+</div>
+
+<script>
+const weapons = [
+    { name: "Cut", price: 0},
+    { name: "Classic", price: 0 },
+    { name: "Shorty", price: 150 },
+    { name: "Frenzy", price: 450 },
+    { name: "Ghost", price: 500 },
+    { name: "Sheriff", price: 800 },
+    { name: "Stinger", price: 1100 },
+    { name: "Spectre", price: 1600 },
+    { name: "Bulldog", price: 2050 },
+    { name: "Guardian", price: 2250 },
+    { name: "Phantom", price: 2900 },
+    { name: "Vandal", price: 2900 },
+    { name: "Operator", price: 4700 }
+];
+
+const moneyInput = document.getElementById("money");
+const shieldCheck = document.getElementById("shield");
+const spellsCheck = document.getElementById("spells");
+const shieldLabel = document.getElementById("shieldLabel");
+const spellsLabel = document.getElementById("spellsLabel");
+const remainingText = document.getElementById("remaining");
+const expensesText = document.getElementById("expenses");
+const spinBtn = document.getElementById("spinBtn");
+const resetBtn = document.getElementById("resetBtn");
+const wheel = document.getElementById("wheel");
+const result = document.getElementById("result");
+const history = document.getElementById("history");
+
+let historyData = [];
+let currentRotation = 0;
+
+function calculateRemaining() {
+    let money = Number(moneyInput.value) || 0;
+    let cost = 0;
+
+    if (shieldCheck.checked) cost += 1000;
+    if (spellsCheck.checked) cost += 600;
+
+    let remaining = money - cost;
+    
+    expensesText.textContent = cost;
+    remainingText.textContent = remaining;
+
+    // Style conditionnel
+    if (remaining < 0) {
+        remainingText.className = "stat-value negative";
+    } else {
+        remainingText.className = "stat-value positive";
+    }
+
+    // Labels actifs
+    if (shieldCheck.checked) {
+        shieldLabel.classList.add("checked");
+    } else {
+        shieldLabel.classList.remove("checked");
+    }
+
+    if (spellsCheck.checked) {
+        spellsLabel.classList.add("checked");
+    } else {
+        spellsLabel.classList.remove("checked");
+    }
+
+    const affordable = weapons.filter(w => w.price <= remaining);
+
+    spinBtn.disabled = affordable.length === 0 || remaining < 0;
+    
+    // Mettre à jour le texte du bouton
+    if (remaining < 0) {
+        spinBtn.textContent = "❌ Budget insuffisant";
+    } else if (affordable.length === 0) {
+        spinBtn.textContent = "❌ Aucune arme disponible";
+    } else {
+        spinBtn.textContent = `🎲 Lancer la roue (${affordable.length} armes)`;
+    }
+}
+
+function addToHistory(weapon) {
+    historyData.unshift(weapon);
+    if (historyData.length > 10) {
+        historyData.pop();
+    }
+    updateHistoryDisplay();
+}
+
+function updateHistoryDisplay() {
+    if (historyData.length === 0) {
+        history.innerHTML = '<div class="empty-history">Aucun lancer pour le moment</div>';
+        return;
+    }
+
+    history.innerHTML = historyData.map(weapon => `
+        <div class="history-item">
+            <span class="history-weapon">${weapon.name}</span>
+            <span class="history-price">${weapon.price} 💰</span>
+        </div>
+    `).join('');
+}
+
+function resetAll() {
+    moneyInput.value = "";
+    shieldCheck.checked = false;
+    spellsCheck.checked = false;
+    wheel.textContent = "?";
+    wheel.style.transform = "rotate(0deg)";
+    currentRotation = 0;
+    result.textContent = "";
+    result.className = "";
+    calculateRemaining();
+}
+
+moneyInput.addEventListener("input", calculateRemaining);
+shieldCheck.addEventListener("change", calculateRemaining);
+spellsCheck.addEventListener("change", calculateRemaining);
+
+spinBtn.addEventListener("click", () => {
+    let remaining = Number(remainingText.textContent);
+
+    const affordable = weapons.filter(w => w.price <= remaining);
+
+    if (affordable.length === 0) {
+        result.textContent = "❌ Aucune arme accessible avec ce budget";
+        result.className = "error";
+        return;
+    }
+
+    const chosen = affordable[Math.floor(Math.random() * affordable.length)];
+
+    // Animation de la roue
+    wheel.classList.add("spinning");
+    const spins = 3 + Math.random() * 2; // 3 à 5 tours
+    const extraRotation = Math.floor(Math.random() * 360);
+    const totalRotation = currentRotation + (spins * 360) + extraRotation;
+    
+    wheel.style.transform = `rotate(${totalRotation}deg)`;
+    currentRotation = totalRotation;
+
+    // Effacer le résultat pendant le spin
+    result.textContent = "🎰 La roue tourne...";
+    result.className = "";
+    spinBtn.disabled = true;
+
+    setTimeout(() => {
+        wheel.textContent = chosen.name;
+        wheel.classList.remove("spinning");
+        result.textContent = `🎉 ${chosen.name} - ${chosen.price} crédits`;
+        result.className = "success";
+        spinBtn.disabled = false;
+        
+        addToHistory(chosen);
+        
+        calculateRemaining();
+    }, 3000);
+});
+
+resetBtn.addEventListener("click", resetAll);
+
+// Initialisation
+calculateRemaining();
+</script>
+
+</body>
+</html>
